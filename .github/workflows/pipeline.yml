@@ -1,0 +1,50 @@
+name: HDB resale pipeline
+
+# Demonstrates the ingestion layer running unattended on a schedule.
+on:
+  schedule:
+    # HDB data refreshes monthly; run on the 5th at 02:00 UTC.
+    - cron: "0 2 5 * *"
+  workflow_dispatch:        # also allow manual runs from the Actions tab
+
+# The job commits the refreshed marts back, so it needs write access.
+permissions:
+  contents: write
+
+# Never let two scheduled runs overlap and race on the push.
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline (ingest -> clean -> load -> export)
+        run: python run_pipeline.py
+
+      # The warehouse and the 36MB fact CSV are gitignored; only the small
+      # aggregated marts are committed. A no-op run commits nothing.
+      - name: Commit refreshed marts
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exports/mart_*.csv
+          if git diff --cached --quiet; then
+            echo "No mart changes this run."
+          else
+            git commit -m "chore: refresh analytical marts [skip ci]"
+            git push
+          fi

@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 
 import config
-from src import clean, ingest, load
+from src import clean, export, ingest, load
 from src.db import connect
 
 
@@ -32,6 +32,9 @@ def run() -> dict:
     try:
         load.apply_schema(con)
         stats = load.load_all(con, records, clean_df, source_total, batch_id)
+
+        # Stage 4a — export CSVs for Tableau (final step, same connection)
+        exported = export.export_all(con)
     finally:
         con.close()
 
@@ -41,6 +44,7 @@ def run() -> dict:
         f"inserted={stats['rows_inserted']:,} "
         f"clean_total={stats['clean_total']:,}"
     )
+    print(f"[export] wrote {len(exported)} CSVs to exports/")
     print(f"=== done in {time.time() - t0:.1f}s ===")
     return stats
 
