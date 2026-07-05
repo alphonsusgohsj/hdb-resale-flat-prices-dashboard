@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Data artefacts — the warehouse is *built*, not source. Commit the code that
+# builds it, never the 200k-row database file.
+data/
+*.duckdb
+*.duckdb.wal
+*.tmp/
+
+# OS
+.DS_Store

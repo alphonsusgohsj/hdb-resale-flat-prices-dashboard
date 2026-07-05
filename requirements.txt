@@ -1,0 +1,4 @@
+# Pinned so the pipeline is reproducible locally and in CI.
+requests==2.34.2
+pandas==3.0.3
+duckdb==1.5.4
