@@ -5,7 +5,7 @@ transactions: it pulls from the **data.gov.sg** API on a schedule, cleans and
 loads into a **DuckDB** analytical warehouse, runs analytical **SQL**, and
 publishes CSV extracts for a **Tableau Public** dashboard.
 
-> **Dashboard:** _(add your Tableau Public URL here after publishing)_
+> **Dashboard:** [Tableau Public — alphonsus.goh](https://public.tableau.com/app/profile/alphonsus.goh/vizzes)
 
 Built as a portfolio project to demonstrate each layer of a real pipeline —
 ingestion, a raw/clean warehouse split, idempotent incremental loads, and
